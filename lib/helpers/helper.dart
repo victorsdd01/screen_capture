@@ -11,7 +11,12 @@ typedef CaptureScreenNative = Void Function(Pointer<Utf8> filePath, Int32 x, Int
 typedef CaptureScreenDart = void Function(Pointer<Utf8> filePath, int x, int y, int width, int height);
 
 class ScreenCapture {
-  final DynamicLibrary? nativeLib = Platform.isMacOS ? DynamicLibrary.process() : Platform.isWindows ? DynamicLibrary.open("screen_capture.dll") : null;
+  final DynamicLibrary? nativeLib = 
+  Platform.isMacOS 
+    ? DynamicLibrary.process() 
+    : Platform.isWindows 
+      ? DynamicLibrary.open("screen_capture.dll") 
+      : null;
 
   late final CaptureScreenDart captureScreen;
 
