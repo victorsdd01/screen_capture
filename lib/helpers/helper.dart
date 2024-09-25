@@ -15,7 +15,7 @@ class ScreenCapture {
   Platform.isMacOS 
     ? DynamicLibrary.process() 
     : Platform.isWindows 
-      ? DynamicLibrary.open("screen_capture.dll") 
+      ? DynamicLibrary.open("assets//Dll_1.dll") 
       : null;
 
   late final CaptureScreenDart captureScreen;
@@ -28,6 +28,8 @@ class ScreenCapture {
   // Modificar esta función para capturar por display
   void takeScreenshotForDisplay(Display display, String path) {
     final filePath = path.toNativeUtf8();
+
+    log('filepath: ${filePath}');
 
     // Obtener las dimensiones y coordenadas del monitor
     int x = display.visiblePosition!.dx.toInt();

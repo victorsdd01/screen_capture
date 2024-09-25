@@ -28,6 +28,7 @@ class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
         for (var i = 0; i < state.displayList.length; i++) {
           final display = state.displayList[i];
           String path = 'screenshot_$i.png';
+          
           _screenCapture.takeScreenshotForDisplay(display, path);
           log('Captured screenshot for ${display.name} at $path');
         }
