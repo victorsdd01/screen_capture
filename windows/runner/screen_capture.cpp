@@ -1,45 +1,14 @@
+
+
 #include <Windows.h>
 #include <gdiplus.h>
 #include <string>
 #include <iostream>
 
-#pragma comment(lib, "gdiplus.lib")
-
-using namespace Gdiplus;
-
-void InitializeGDIPlus() {
-    GdiplusStartupInput gdiplusStartupInput;
-    ULONG_PTR gdiplusToken;
-    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-}
-
-int GetEncoderClsid(const WCHAR* format, CLSID* pClsid) {
-    UINT num = 0;          // Número de encoders
-    UINT size = 0;         // Tamaño de la información de los encoders
-
-    GetImageEncodersSize(&num, &size);
-    if (size == 0) return -1; // Error: No hay encoders
-
-    ImageCodecInfo* pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
-    if (pImageCodecInfo == NULL) return -1; // Error: Memoria no disponible
-
-    GetImageEncoders(num, size, pImageCodecInfo);
-
-    for (UINT j = 0; j < num; ++j) {
-        if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0) {
-            *pClsid = pImageCodecInfo[j].Clsid;
-            free(pImageCodecInfo);
-            return j; // Retorna el índice del encoder
-        }
-    }
-
-    free(pImageCodecInfo);
-    return -1; // Error: No se encontró el encoder
-}
-
-extern "C" __declspec(dllexport) void captureScreen(const char* filePath, int x, int y, int width, int height) {
-    // Inicializar GDI+
-    InitializeGDIPlus();
+extern "C" __declspec(dllexport) void captureScreen(const char* filePath) {
+    // Obtener el tamaño de la pantalla
+    int screenX = GetSystemMetrics(SM_CXSCREEN);
+    int screenY = GetSystemMetrics(SM_CYSCREEN);
 
     // Obtener el tamaño de la pantalla
     HDC hScreenDC = GetDC(NULL);
@@ -48,23 +17,40 @@ extern "C" __declspec(dllexport) void captureScreen(const char* filePath, int x,
     SelectObject(hMemoryDC, hBitmap);
 
     // Copiar la pantalla en el bitmap
-    BitBlt(hMemoryDC, 0, 0, width, height, hScreenDC, x, y, SRCCOPY);
+    BitBlt(hMemoryDC, 0, 0, screenX, screenY, hScreenDC, 0, 0, SRCCOPY);
 
-    // Convertir el char* a wstring para usar con GDI+
-    std::wstring wsFilePath = std::wstring(filePath, filePath + strlen(filePath));
+    // Guardar la imagen como archivo
+    BITMAPFILEHEADER bfHeader;
+    BITMAPINFOHEADER biHeader;
+    BITMAPINFO bInfo;
+    bInfo.bmiHeader = biHeader;
+    
+    // Inicializar el contenido del bitmap
+    biHeader.biSize = sizeof(BITMAPINFOHEADER);
+    biHeader.biWidth = screenX;
+    biHeader.biHeight = screenY;
+    biHeader.biPlanes = 1;
+    biHeader.biBitCount = 24; // Para guardar la imagen en 24 bits
+    biHeader.biCompression = BI_RGB;
+    biHeader.biSizeImage = 0;
+    biHeader.biXPelsPerMeter = 0;
+    biHeader.biYPelsPerMeter = 0;
+    biHeader.biClrUsed = 0;
+    biHeader.biClrImportant = 0;
 
-    // Guardar la imagen como PNG usando GDI+
-    Bitmap bitmap(hBitmap, NULL);
-    CLSID pngClsid;
-    if (GetEncoderClsid(L"image/png", &pngClsid) != -1) {
-        // Aquí, pasamos NULL en los parámetros del encoder si no necesitamos configuración específica
-        Status stat = bitmap.Save(wsFilePath.c_str(), &pngClsid, NULL);
+    // Guardar el archivo en el path especificado
+    FILE* file;
+    fopen_s(&file, filePath, "wb");
 
-        if (stat != Ok) {
-            std::cerr << "Error al guardar la imagen: " << stat << std::endl;
+    if (file != NULL) {
+        fwrite(&bfHeader, sizeof(BITMAPFILEHEADER), 1, file);
+        fwrite(&biHeader, sizeof(BITMAPINFOHEADER), 1, file);
+        
+        // Escribir los datos del bitmap
+        for (int y = 0; y < screenY; y++) {
+            fwrite(&hBitmap, 3 * screenX, 1, file);
         }
-    } else {
-        std::cerr << "Error: No se encontró el encoder PNG." << std::endl;
+        fclose(file);
     }
 
     // Liberar recursos
