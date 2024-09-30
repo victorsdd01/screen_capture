@@ -39,7 +39,7 @@ class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
     });
     on<LoadAcreenshotsEvent>((event,emit) async {
       try {
-        final Directory directory = await getApplicationSupportDirectory();
+        final Directory directory = await getTemporaryDirectory();
         final List<File> screenshots = <File>[];
         for (var i = 0; i < state.displayList.length; i++) {
           final path = '${directory.path}/screenshot_$i.png';
@@ -59,7 +59,7 @@ class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
               screenShots: screenshots,
               displayStatus: DisplayStatus.uploaded
             ));
-            add(DeleteScreenshotsEvent());
+            // add(DeleteScreenshotsEvent());
           });
         }
       } catch (e) {
@@ -69,7 +69,7 @@ class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
     });
     on<DeleteScreenshotsEvent>((event, emit) async {
       try {
-        final Directory directory = await getApplicationSupportDirectory();
+        final Directory directory = await getTemporaryDirectory();
         for (var i = 0; i < state.screenShots.length; i++) {
           final path = '${directory.path}/screenshot_$i.png';
           final file = File(path);
