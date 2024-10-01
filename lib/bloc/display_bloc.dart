@@ -27,7 +27,7 @@ class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
       try {  
         for (var i = 0; i < state.displayList.length; i++) {
           final display = state.displayList[i];
-          String path = 'screenshot_$i.png';
+          String path = 'screenshot_$i.${Platform.isWindows ? 'bmp' : 'png'}';
 
           // Platform.isWindows ? _screenCapture.takeScreenshotForDisplay(display, "") : _screenCapture.takeScreenshotForDisplay(display, path);
           await _screenCapture.takeScreenshotForDisplay(display, path);
@@ -43,7 +43,7 @@ class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
         final Directory directory = await getTemporaryDirectory();
         final List<File> screenshots = <File>[];
         for (var i = 0; i < state.displayList.length; i++) {
-          final path = '${directory.path}/screenshot_$i.png';
+          final path = '${directory.path}/screenshot_$i.${Platform.isWindows ? 'bmp' : 'png'}';
           final file = File(path);
           if (await file.exists()) {
             screenshots.add(file);
@@ -72,7 +72,7 @@ class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
       try {
         final Directory directory = await getTemporaryDirectory();
         for (var i = 0; i < state.screenShots.length; i++) {
-          final path = '${directory.path}/screenshot_$i.png';
+          final path = '${directory.path}/screenshot_$i.${Platform.isWindows ? 'bmp' : 'png'}';
           final file = File(path);
           if (await file.exists()) {
             await file.delete();
