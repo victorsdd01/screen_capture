@@ -34,13 +34,19 @@ class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
           // String name = 'screenshot_$i.${Platform.isWindows ? 'bmp' : 'png'}';
           // await _screenCapture.takeScreenshotForDisplay(display, name);
 
-          await capturer.capture(
+          final CapturedData? screenshot = await capturer.capture(
             imagePath: name,
-            mode: CaptureMode.screen
+            mode: CaptureMode.screen,
           );
+
+          
+
+          log('screenshot: ${screenshot?.imagePath}');
 
           log('Captured screenshot for ${display.name} at $name');
         }
+
+        
         add(LoadAcreenshotsEvent());
       } catch (e) {
         log('Error capturing screenshots: $e');
