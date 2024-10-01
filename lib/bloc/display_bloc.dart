@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:screen_capturer/screen_capturer.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:screenshot_playground/helpers/helper.dart';
 import 'package:screenshot_playground/helpers/locator.dart';
@@ -24,14 +25,21 @@ class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
       }
     });
     on<TakeScreenshotEvent>((event, emit) async {
-      try {  
+      try {
+        final Directory directory = await getTemporaryDirectory();
+        final ScreenCapturer capturer = ScreenCapturer.instance;
         for (var i = 0; i < state.displayList.length; i++) {
           final display = state.displayList[i];
-          String path = 'screenshot_$i.${Platform.isWindows ? 'bmp' : 'png'}';
+          final name = '${directory.path}/screenshot_$i.png';
+          // String name = 'screenshot_$i.${Platform.isWindows ? 'bmp' : 'png'}';
+          // await _screenCapture.takeScreenshotForDisplay(display, name);
 
-          // Platform.isWindows ? _screenCapture.takeScreenshotForDisplay(display, "") : _screenCapture.takeScreenshotForDisplay(display, path);
-          await _screenCapture.takeScreenshotForDisplay(display, path);
-          log('Captured screenshot for ${display.name} at $path');
+          await capturer.capture(
+            imagePath: name,
+            mode: CaptureMode.screen
+          );
+
+          log('Captured screenshot for ${display.name} at $name');
         }
         add(LoadAcreenshotsEvent());
       } catch (e) {

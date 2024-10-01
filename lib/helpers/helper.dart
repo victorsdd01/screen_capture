@@ -13,10 +13,10 @@ typedef CaptureScreenDart = void Function(Pointer<Utf8> filePath, int x, int y, 
 
 class ScreenCapture {
   final DynamicLibrary? nativeLib = 
-  Platform.isMacOS 
-    ? DynamicLibrary.process() 
-    : Platform.isWindows 
-      ? DynamicLibrary.open("assets//Dll_1.dll") 
+  Platform.isMacOS
+    ? DynamicLibrary.process()
+    : Platform.isWindows
+      ? DynamicLibrary.open("assets//Dll_1.dll")
       : null;
 
   late final CaptureScreenDart captureScreen;
@@ -45,3 +45,4 @@ class ScreenCapture {
     log('Captured screenshot for display at $x, $y, $width, $height');
   }
 }
+

@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  screen_capturer_linux
   screen_retriever_linux
 )
 
