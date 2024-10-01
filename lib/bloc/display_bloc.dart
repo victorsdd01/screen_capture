@@ -15,7 +15,7 @@ part 'display_state.dart';
 
 class DisplayBloc extends Bloc<DisplayEvent, DisplayState> {
 
-  final ScreenCapture _screenCapture = locator<ScreenCapture>();
+  // final ScreenCapture _screenCapture = locator<ScreenCapture>();
   DisplayBloc() : super(const DisplayState()) {
     on<AddDisplaysEvent>((event, emit) async {
       try {

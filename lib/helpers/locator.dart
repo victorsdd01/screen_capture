@@ -9,6 +9,6 @@ GetIt locator = GetIt.instance;
 
 
 void setupLocator() {
-  locator.registerLazySingleton(() => ScreenCapture());
+  // locator.registerLazySingleton(() => ScreenCapture());
   locator.registerLazySingleton(() => DisplayBloc());
 }
